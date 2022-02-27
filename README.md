@@ -1,2 +1,3 @@
 # snaps
-Choice a random snap word
+
+Choose a random snap word
