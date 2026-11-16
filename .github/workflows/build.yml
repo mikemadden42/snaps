@@ -7,59 +7,52 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-          [
-            ubuntu-22.04,
-            ubuntu-24.04,
-            windows-2025,
-            windows-2022,
-            macos-26,
-            macos-15,
-            macos-14,
-          ]
-        toolchain: [stable, beta, nightly]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        toolchain: [stable]
+        include:
+          - os: ubuntu-latest
+            toolchain: beta
+          - os: ubuntu-latest
+            toolchain: nightly
+          - os: ubuntu-latest
+            toolchain: "1.63"
     steps:
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
-          override: true
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - name: Build
         run: cargo build --verbose
-        continue-on-error: ${{ matrix.toolchain != 'stable' }}
+        continue-on-error: ${{ matrix.toolchain == 'beta' || matrix.toolchain == 'nightly' }}
       - name: Run tests
         run: cargo test --verbose
-        continue-on-error: ${{ matrix.toolchain != 'stable' }}
+        continue-on-error: ${{ matrix.toolchain == 'beta' || matrix.toolchain == 'nightly' }}
 
   clippy:
     name: clippy (ubuntu-latest, stable)
     runs-on: ubuntu-latest
     steps:
       - name: Install latest stable
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
           components: clippy
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - name: Cargo Clippy
-        run: cargo clippy -- -D warnings -A deprecated
+        run: cargo clippy --all-targets -- -D warnings
 
   fmt:
     name: fmt (ubuntu-latest, stable)
     runs-on: ubuntu-latest
     steps:
       - name: Install latest stable
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
           components: rustfmt
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Check Formatting
         run: cargo fmt --all -- --check
