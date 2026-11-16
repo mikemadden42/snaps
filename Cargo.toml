@@ -2,8 +2,10 @@
 name = "snaps"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+rust-version = "1.63"
+description = "Choose a random snap word"
+license = "MIT"
+repository = "https://github.com/mikemadden42/snaps"
 
 [dependencies]
 rand = "0.9.1"

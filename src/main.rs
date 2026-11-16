@@ -1,11 +1,28 @@
-use rand::rng;
 use rand::seq::IndexedRandom;
+use rand::{rng, Rng};
+
+const WORDS: &[&str] = &["begin", "great", "suddenly", "before", "enough", "probably"];
+
+fn pick_word<R: Rng + ?Sized>(rng: &mut R) -> Option<&'static str> {
+    WORDS.choose(rng).copied()
+}
 
 fn main() {
-    let words = ["begin", "great", "suddenly", "before", "enough", "probably"];
-    let mut rng = rng();
-    // https://www.dotnetperls.com/if-rust
-    if let Some(word) = words.choose(&mut rng) {
+    if let Some(word) = pick_word(&mut rng()) {
         println!("{word}");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn picks_word_from_list() {
+        let mut rng = rng();
+        for _ in 0..100 {
+            let word = pick_word(&mut rng).unwrap();
+            assert!(WORDS.contains(&word));
+        }
     }
 }
